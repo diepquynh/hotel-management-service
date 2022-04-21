@@ -15,6 +15,7 @@ import vn.utc.hotelmanager.hotel.data.dto.BookingRequestDTO;
 import vn.utc.hotelmanager.hotel.model.Receipt;
 import vn.utc.hotelmanager.hotel.model.ReceiptRoom;
 import vn.utc.hotelmanager.hotel.model.Room;
+import vn.utc.hotelmanager.utils.DateUtils;
 
 import javax.transaction.Transactional;
 import java.sql.SQLException;
@@ -50,18 +51,25 @@ public class BookingService {
         if (targetRoom.getRoomType().getSeatCount() < bookingRequest.getCapacity())
             throw new InvalidRequestException("Too many people, this room does not fit");
 
+        Instant startDate = bookingRequest.getStartDate().atZone(ZoneId.systemDefault()).toInstant();
+        Instant endDate = bookingRequest.getEndDate().atZone(ZoneId.systemDefault()).toInstant();
+
+        int numDays = DateUtils.daysBetween(startDate, endDate);
+        double balance = targetRoom.getRoomType().getPrice() * numDays;
+
         User bookingUser = userRepository.findByUsername(ApplicationUserService.getCurrentUser().getUsername());
         Receipt newReceipt = Receipt.builder()
                 .created_date(Instant.now())
                 .user(bookingUser)
+                .total_balance(balance)
                 .build();
         receiptRepository.save(newReceipt);
 
         ReceiptRoom newReceiptRoom = ReceiptRoom.builder()
                 .receipt(newReceipt)
                 .room(targetRoom)
-                .arrivalTime(bookingRequest.getStartDate().atZone(ZoneId.systemDefault()).toInstant())
-                .leaveTime(bookingRequest.getEndDate().atZone(ZoneId.systemDefault()).toInstant())
+                .arrivalTime(startDate)
+                .leaveTime(endDate)
                 .build();
 
         try {
