@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Set;
 
 @Entity
@@ -37,4 +39,13 @@ public class ReceiptRoom {
 
     @Column(name = "leave_time")
     private Instant leaveTime;
+
+    public boolean isRoomReceiptActive() {
+        Instant currentTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
+        return currentTime.isAfter(arrivalTime) && currentTime.isBefore(leaveTime);
+    }
+
+    public void addService(Service service) {
+        services.add(service);
+    }
 }

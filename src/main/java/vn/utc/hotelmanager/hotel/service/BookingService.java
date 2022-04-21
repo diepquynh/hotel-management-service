@@ -3,6 +3,7 @@ package vn.utc.hotelmanager.hotel.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import vn.utc.hotelmanager.auth.user.data.UserRepository;
 import vn.utc.hotelmanager.auth.user.model.User;
 import vn.utc.hotelmanager.auth.user.service.ApplicationUserService;
@@ -11,7 +12,8 @@ import vn.utc.hotelmanager.exception.RepositoryAccessException;
 import vn.utc.hotelmanager.hotel.data.ReceiptRepository;
 import vn.utc.hotelmanager.hotel.data.ReceiptRoomRepository;
 import vn.utc.hotelmanager.hotel.data.RoomRepository;
-import vn.utc.hotelmanager.hotel.data.dto.BookingRequestDTO;
+import vn.utc.hotelmanager.hotel.data.dto.BookingDTO;
+import vn.utc.hotelmanager.hotel.data.dto.BookingDetailsDTO;
 import vn.utc.hotelmanager.hotel.model.Receipt;
 import vn.utc.hotelmanager.hotel.model.ReceiptRoom;
 import vn.utc.hotelmanager.hotel.model.Room;
@@ -22,6 +24,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 
 @Service
 public class BookingService {
@@ -40,22 +43,38 @@ public class BookingService {
     }
 
     @Transactional
-    public void BookThisRoom(BookingRequestDTO bookingRequest) {
-        verifyBookingRequest(bookingRequest);
-        Room targetRoom = roomRepository.findById(bookingRequest.getRoomId()).orElseThrow(
-                () -> new ResourceNotFoundException(
-                        String.format("Room with id %d does not exist", bookingRequest.getRoomId())
-                )
-        );
+    public void BookThisRoom(BookingDTO bookingRequest) {
+        if (CollectionUtils.isEmpty(bookingRequest.getBookingDetails()))
+            throw new InvalidRequestException("Booking details cannot be empty");
 
-        if (targetRoom.getRoomType().getSeatCount() < bookingRequest.getCapacity())
-            throw new InvalidRequestException("Too many people, this room does not fit");
+        ArrayList<ReceiptRoom> receiptRooms = new ArrayList<>();
+        double balance = 0;
 
-        Instant startDate = bookingRequest.getStartDate().atZone(ZoneId.systemDefault()).toInstant();
-        Instant endDate = bookingRequest.getEndDate().atZone(ZoneId.systemDefault()).toInstant();
+        for (BookingDetailsDTO bookingDetail : bookingRequest.getBookingDetails()) {
+            verifyBookingRequest(bookingDetail);
+            Room targetRoom = roomRepository.findById(bookingDetail.getRoomId()).orElseThrow(
+                    () -> new ResourceNotFoundException(
+                            String.format("Room with id %d does not exist", bookingDetail.getRoomId())
+                    )
+            );
 
-        int numDays = DateUtils.daysBetween(startDate, endDate);
-        double balance = targetRoom.getRoomType().getPrice() * numDays;
+            if (targetRoom.getRoomType().getSeatCount() < bookingDetail.getCapacity())
+                throw new InvalidRequestException("Too many people, this room does not fit");
+
+            Instant startDate = bookingDetail.getStartDate().atZone(ZoneId.systemDefault()).toInstant();
+            Instant endDate = bookingDetail.getEndDate().atZone(ZoneId.systemDefault()).toInstant();
+
+            int numDays = DateUtils.daysBetween(startDate, endDate);
+            balance += targetRoom.getRoomType().getPrice() * numDays;
+
+            ReceiptRoom newReceiptRoom = ReceiptRoom.builder()
+                    .room(targetRoom)
+                    .arrivalTime(startDate)
+                    .leaveTime(endDate)
+                    .build();
+
+            receiptRooms.add(newReceiptRoom);
+        }
 
         User bookingUser = userRepository.findByUsername(ApplicationUserService.getCurrentUser().getUsername());
         Receipt newReceipt = Receipt.builder()
@@ -65,15 +84,11 @@ public class BookingService {
                 .build();
         receiptRepository.save(newReceipt);
 
-        ReceiptRoom newReceiptRoom = ReceiptRoom.builder()
-                .receipt(newReceipt)
-                .room(targetRoom)
-                .arrivalTime(startDate)
-                .leaveTime(endDate)
-                .build();
+        for (ReceiptRoom receiptRoom : receiptRooms)
+            receiptRoom.setReceipt(newReceipt);
 
         try {
-            receiptRoomRepository.save(newReceiptRoom);
+            receiptRoomRepository.saveAll(receiptRooms);
         } catch (Exception e) {
             String msg = e.getMessage();
             if (e.getCause().getCause() instanceof SQLException)
@@ -84,15 +99,15 @@ public class BookingService {
         }
     }
 
-    private void verifyBookingRequest(BookingRequestDTO bookingRequest) {
-        if (bookingRequest.getRoomId() == null)
+    private void verifyBookingRequest(BookingDetailsDTO bookingDetail) {
+        if (bookingDetail.getRoomId() == null)
             throw new InvalidRequestException("Room id cannot be null");
 
-        if (bookingRequest.getRoomId() < 0)
+        if (bookingDetail.getRoomId() < 0)
             throw new InvalidRequestException("Invalid room id: cannot be negative");
 
-        LocalDateTime startDate = bookingRequest.getStartDate();
-        LocalDateTime endDate = bookingRequest.getEndDate();
+        LocalDateTime startDate = bookingDetail.getStartDate();
+        LocalDateTime endDate = bookingDetail.getEndDate();
 
         if (startDate == null)
             throw new InvalidRequestException("Booking start date cannot be empty");
@@ -103,10 +118,10 @@ public class BookingService {
         if (startDate.isAfter(endDate))
             throw new InvalidRequestException("Booking start date cannot be behind end date");
 
-        if (bookingRequest.getCapacity() == null)
+        if (bookingDetail.getCapacity() == null)
             throw new InvalidRequestException("Capacity cannot be empty");
 
-        if (bookingRequest.getCapacity() < 0)
+        if (bookingDetail.getCapacity() < 0)
             throw new InvalidRequestException("Invalid capacity size: cannot be less than zero");
     }
 }

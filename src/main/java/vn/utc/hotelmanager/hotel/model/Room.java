@@ -36,4 +36,15 @@ public class Room {
             inverseJoinColumns = @JoinColumn(name = "room_type_id", referencedColumnName = "id")
     )
     private RoomType roomType;
+
+    public ReceiptRoom getActiveReceiptRoom() {
+        if (receiptRooms != null) {
+            for (ReceiptRoom receiptRoom : receiptRooms) {
+                if (receiptRoom.isRoomReceiptActive())
+                    return receiptRoom;
+            }
+        }
+
+        return null;
+    }
 }

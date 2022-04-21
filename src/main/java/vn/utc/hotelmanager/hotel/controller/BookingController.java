@@ -5,8 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vn.utc.hotelmanager.hotel.data.dto.BookingRequestDTO;
+import vn.utc.hotelmanager.hotel.data.dto.BookingDTO;
 import vn.utc.hotelmanager.hotel.service.BookingService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/bookings")
@@ -21,7 +23,7 @@ public class BookingController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Void> bookThisRoom(@RequestBody BookingRequestDTO bookingRequest) {
+    public ResponseEntity<Void> bookThisRoom(@RequestBody BookingDTO bookingRequest) {
         bookingService.BookThisRoom(bookingRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
