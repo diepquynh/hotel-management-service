@@ -38,4 +38,8 @@ public class Receipt {
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
     )
     private User user;
+
+    public void addTotalBalance(Double extraBalance) {
+        total_balance += extraBalance;
+    }
 }
