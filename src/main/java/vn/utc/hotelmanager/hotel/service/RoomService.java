@@ -9,9 +9,9 @@ import vn.utc.hotelmanager.exception.RepositoryAccessException;
 import vn.utc.hotelmanager.exception.RoomAlreadyExistedException;
 import vn.utc.hotelmanager.hotel.data.RoomRepository;
 import vn.utc.hotelmanager.hotel.data.RoomTypeRepository;
-import vn.utc.hotelmanager.hotel.data.dto.RoomFilterRequestDTO;
-import vn.utc.hotelmanager.hotel.data.dto.RoomRequestDTO;
-import vn.utc.hotelmanager.hotel.data.dto.RoomResponseDTO;
+import vn.utc.hotelmanager.hotel.data.dto.request.RoomFilterRequestDTO;
+import vn.utc.hotelmanager.hotel.data.dto.request.RoomRequestDTO;
+import vn.utc.hotelmanager.hotel.data.dto.response.RoomResponseDTO;
 import vn.utc.hotelmanager.hotel.model.Room;
 import vn.utc.hotelmanager.hotel.model.RoomType;
 

@@ -5,9 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import vn.utc.hotelmanager.hotel.data.dto.RoomFilterRequestDTO;
-import vn.utc.hotelmanager.hotel.data.dto.RoomRequestDTO;
-import vn.utc.hotelmanager.hotel.data.dto.RoomResponseDTO;
+import vn.utc.hotelmanager.hotel.data.dto.request.RoomFilterRequestDTO;
+import vn.utc.hotelmanager.hotel.data.dto.request.RoomRequestDTO;
+import vn.utc.hotelmanager.hotel.data.dto.response.RoomResponseDTO;
 import vn.utc.hotelmanager.hotel.service.RoomService;
 
 import java.time.LocalDate;

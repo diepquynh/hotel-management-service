@@ -1,7 +1,7 @@
 package vn.utc.hotelmanager.hotel.data;
 
 import org.springframework.stereotype.Component;
-import vn.utc.hotelmanager.hotel.data.dto.RoomFilterRequestDTO;
+import vn.utc.hotelmanager.hotel.data.dto.request.RoomFilterRequestDTO;
 import vn.utc.hotelmanager.hotel.model.Room;
 import vn.utc.hotelmanager.hotel.model.RoomType;
 import vn.utc.hotelmanager.hotel.model.RoomType_;

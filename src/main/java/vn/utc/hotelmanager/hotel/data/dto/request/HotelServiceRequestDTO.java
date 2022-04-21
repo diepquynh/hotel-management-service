@@ -1,4 +1,4 @@
-package vn.utc.hotelmanager.hotel.data.dto;
+package vn.utc.hotelmanager.hotel.data.dto.request;
 
 import lombok.Data;
 

@@ -1,6 +1,6 @@
 package vn.utc.hotelmanager.hotel.data;
 
-import vn.utc.hotelmanager.hotel.data.dto.HotelServiceFilterRequestDTO;
+import vn.utc.hotelmanager.hotel.data.dto.request.HotelServiceFilterRequestDTO;
 import vn.utc.hotelmanager.hotel.model.Service;
 
 import java.util.List;

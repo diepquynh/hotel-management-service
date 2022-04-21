@@ -8,7 +8,7 @@ import vn.utc.hotelmanager.auth.user.data.UserRepository;
 import vn.utc.hotelmanager.auth.user.model.User;
 import vn.utc.hotelmanager.auth.user.service.ApplicationUserService;
 import vn.utc.hotelmanager.hotel.data.ResponseRepository;
-import vn.utc.hotelmanager.hotel.data.dto.HotelResponseDTO;
+import vn.utc.hotelmanager.hotel.data.dto.response.HotelResponseDTO;
 import vn.utc.hotelmanager.hotel.model.Response;
 
 import java.util.List;
