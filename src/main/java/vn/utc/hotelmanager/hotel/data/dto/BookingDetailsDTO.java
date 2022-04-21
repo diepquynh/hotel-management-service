@@ -29,5 +29,6 @@ public class BookingDetailsDTO {
         setEndDate(LocalDateTime.ofInstant(
                 receiptRoom.getLeaveTime(), ZoneId.systemDefault()
         ));
+        setCapacity(receiptRoom.getCapacity());
     }
 }

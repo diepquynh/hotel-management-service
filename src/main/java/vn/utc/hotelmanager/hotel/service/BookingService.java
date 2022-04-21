@@ -74,7 +74,7 @@ public class BookingService {
                     )
             );
 
-            if (targetRoom.getRoomType().getSeatCount() < bookingDetail.getCapacity())
+            if (targetRoom.getRoomType().getCapacity() < bookingDetail.getCapacity())
                 throw new InvalidRequestException("Too many people, this room does not fit");
 
             Instant startDate = bookingDetail.getStartDate().atZone(ZoneId.systemDefault()).toInstant();
@@ -87,6 +87,7 @@ public class BookingService {
                     .room(targetRoom)
                     .arrivalTime(startDate)
                     .leaveTime(endDate)
+                    .capacity(bookingDetail.getCapacity())
                     .build();
 
             receiptRooms.add(newReceiptRoom);

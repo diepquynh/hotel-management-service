@@ -39,11 +39,11 @@ public class CustomRoomRepositoryImpl implements CustomRoomRepository {
                     roomRequest.getPriceTo()));
 
         if (roomRequest.getSeatCountFrom() != null)
-            predicates.add(cb.greaterThanOrEqualTo(rooms.get(RoomType_.SEAT_COUNT),
+            predicates.add(cb.greaterThanOrEqualTo(rooms.get(RoomType_.CAPACITY),
                     roomRequest.getSeatCountFrom()));
 
         if (roomRequest.getSeatCountTo() != null)
-            predicates.add(cb.lessThanOrEqualTo(rooms.get(RoomType_.SEAT_COUNT),
+            predicates.add(cb.lessThanOrEqualTo(rooms.get(RoomType_.CAPACITY),
                     roomRequest.getSeatCountTo()));
 
         query.select(root).where(predicates.toArray(new Predicate[]{}));

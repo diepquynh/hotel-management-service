@@ -27,8 +27,8 @@ public class RoomType {
     @Column(name = "price")
     private Double price;
 
-    @Column(name = "seat_count")
-    private Integer seatCount;
+    @Column(name = "capacity")
+    private Integer capacity;
 
     @JsonIgnore
     @OneToMany(mappedBy = "roomType", cascade = CascadeType.ALL)

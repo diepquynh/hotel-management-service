@@ -40,6 +40,9 @@ public class ReceiptRoom {
     @Column(name = "leave_time")
     private Instant leaveTime;
 
+    @Column(name = "capacity")
+    private Integer capacity;
+
     public boolean isRoomReceiptActive() {
         Instant currentTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
         return currentTime.isAfter(arrivalTime) && currentTime.isBefore(leaveTime);
