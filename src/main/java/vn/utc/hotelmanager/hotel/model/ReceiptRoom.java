@@ -1,9 +1,6 @@
 package vn.utc.hotelmanager.hotel.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -32,6 +29,8 @@ public class ReceiptRoom {
     private Room room;
 
     @ManyToMany(mappedBy = "receiptRooms")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Service> services;
 
     @Column(name = "arrival_time")

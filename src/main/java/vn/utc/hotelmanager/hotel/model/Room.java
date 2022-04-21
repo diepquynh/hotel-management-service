@@ -1,9 +1,6 @@
 package vn.utc.hotelmanager.hotel.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -27,6 +24,8 @@ public class Room {
     private String image;
 
     @OneToMany(mappedBy = "room")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<ReceiptRoom> receiptRooms;
 
     @ManyToOne

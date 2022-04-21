@@ -1,9 +1,6 @@
 package vn.utc.hotelmanager.hotel.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import vn.utc.hotelmanager.auth.user.model.User;
 
 import javax.persistence.*;
@@ -29,6 +26,8 @@ public class Receipt {
     private Double total_balance;
 
     @OneToMany(mappedBy = "receipt")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<ReceiptRoom> receiptRooms;
 
     @ManyToOne

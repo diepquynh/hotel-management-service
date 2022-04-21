@@ -1,6 +1,8 @@
 package vn.utc.hotelmanager.hotel.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -26,6 +28,8 @@ public class Service {
     @Column(name = "image", length = 256)
     private String image;
 
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "receipts_rooms_services",

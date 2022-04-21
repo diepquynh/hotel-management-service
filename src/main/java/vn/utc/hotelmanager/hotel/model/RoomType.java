@@ -1,10 +1,7 @@
 package vn.utc.hotelmanager.hotel.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -32,5 +29,7 @@ public class RoomType {
 
     @JsonIgnore
     @OneToMany(mappedBy = "roomType", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Room> rooms;
 }
