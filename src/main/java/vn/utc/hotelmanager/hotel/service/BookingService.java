@@ -25,6 +25,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
@@ -40,6 +42,20 @@ public class BookingService {
         this.roomRepository = roomRepository;
         this.receiptRepository = receiptRepository;
         this.receiptRoomRepository = receiptRoomRepository;
+    }
+
+    public List<BookingDTO> getUserBookings() {
+        List<BookingDTO> bookingDTOS = new ArrayList<>();
+
+        List<Receipt> userReceipts = receiptRepository.findReceiptsByUsername(
+                ApplicationUserService.getCurrentUser().getUsername()
+        );
+
+        if (!CollectionUtils.isEmpty(userReceipts))
+            bookingDTOS = userReceipts.stream().map(BookingDTO::new)
+                    .collect(Collectors.toList());
+
+        return bookingDTOS;
     }
 
     @Transactional

@@ -21,6 +21,12 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<List<BookingDTO>> getUserBookings() {
+        return new ResponseEntity<>(bookingService.getUserBookings(), HttpStatus.OK);
+    }
+
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<Void> bookThisRoom(@RequestBody BookingDTO bookingRequest) {
