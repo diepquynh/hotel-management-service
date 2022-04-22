@@ -32,7 +32,9 @@ public class ExtrasService {
     private final ReceiptRoomServiceRepository receiptRoomServiceRepository;
 
     @Autowired
-    public ExtrasService(RoomRepository roomRepository, ServiceRepository serviceRepository, ReceiptRepository receiptRepository, ReceiptRoomRepository receiptRoomRepository, ReceiptRoomServiceRepository receiptRoomServiceRepository) {
+    public ExtrasService(RoomRepository roomRepository, ServiceRepository serviceRepository,
+                         ReceiptRepository receiptRepository, ReceiptRoomRepository receiptRoomRepository,
+                         ReceiptRoomServiceRepository receiptRoomServiceRepository) {
         this.roomRepository = roomRepository;
         this.serviceRepository = serviceRepository;
         this.receiptRepository = receiptRepository;

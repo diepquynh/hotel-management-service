@@ -37,7 +37,8 @@ public class BookingService {
     private final ReceiptRoomRepository receiptRoomRepository;
 
     @Autowired
-    public BookingService(UserRepository userRepository, RoomRepository roomRepository, ReceiptRepository receiptRepository, ReceiptRoomRepository receiptRoomRepository) {
+    public BookingService(UserRepository userRepository, RoomRepository roomRepository,
+                          ReceiptRepository receiptRepository, ReceiptRoomRepository receiptRoomRepository) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.receiptRepository = receiptRepository;
