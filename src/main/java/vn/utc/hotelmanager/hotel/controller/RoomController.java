@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import vn.utc.hotelmanager.hotel.data.dto.request.AvailableRoomRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.RoomFilterRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.RoomRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.response.RoomResponseDTO;
@@ -49,10 +50,10 @@ public class RoomController {
 
     @GetMapping("/available")
     public ResponseEntity<List<RoomResponseDTO>> getAvailableRoomsBetweenTime(
-            @RequestParam("dateFrom") LocalDateTime dateFrom,
-            @RequestParam("dateTo") LocalDateTime dateTo) {
+            @RequestBody AvailableRoomRequestDTO roomRequest) {
         return new ResponseEntity<>(
-                roomService.getAvailableRoomsForDateRange(dateFrom, dateTo), HttpStatus.OK);
+                roomService.getAvailableRoomsForDateRange(
+                        roomRequest.getStartDate(), roomRequest.getEndDate()), HttpStatus.OK);
     }
 
     @GetMapping("/{roomId}")
