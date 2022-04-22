@@ -1,7 +1,6 @@
 package vn.utc.hotelmanager.hotel.model;
 
 import lombok.*;
-import vn.utc.hotelmanager.auth.user.model.User;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -30,13 +29,10 @@ public class Receipt {
     @ToString.Exclude
     private Set<ReceiptRoom> receiptRooms;
 
-    @ManyToOne
-    @JoinTable(
-            name = "users_receipts",
-            joinColumns = @JoinColumn(name = "receipt_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
-    )
-    private User user;
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "receipt", orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private UserReceipt userReceipt;
 
     public void addTotalBalance(Double extraBalance) {
         total_balance += extraBalance;

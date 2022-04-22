@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import vn.utc.hotelmanager.hotel.model.Receipt;
 import vn.utc.hotelmanager.hotel.model.Response;
+import vn.utc.hotelmanager.hotel.model.UserReceipt;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -54,7 +55,7 @@ public class User implements Serializable {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private Set<Receipt> receipts;
+    private Set<UserReceipt> userReceipts;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

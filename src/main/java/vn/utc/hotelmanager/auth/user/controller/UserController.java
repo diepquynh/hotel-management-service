@@ -4,14 +4,13 @@ import vn.utc.hotelmanager.auth.exception.UserAlreadyExistException;
 import vn.utc.hotelmanager.auth.user.data.UserRepository;
 import vn.utc.hotelmanager.auth.user.data.dto.UserRegistrationDTO;
 import vn.utc.hotelmanager.auth.user.model.User;
-import vn.utc.hotelmanager.auth.user.service.ApplicationUserService;
+import vn.utc.hotelmanager.utils.ApplicationUserService;
 import vn.utc.hotelmanager.auth.user.service.OAuth2UserServiceImpl;
 import vn.utc.hotelmanager.auth.user.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;

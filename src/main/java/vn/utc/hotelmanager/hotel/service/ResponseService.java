@@ -6,7 +6,7 @@ import vn.utc.hotelmanager.exception.InvalidRequestException;
 import vn.utc.hotelmanager.exception.RepositoryAccessException;
 import vn.utc.hotelmanager.auth.user.data.UserRepository;
 import vn.utc.hotelmanager.auth.user.model.User;
-import vn.utc.hotelmanager.auth.user.service.ApplicationUserService;
+import vn.utc.hotelmanager.utils.ApplicationUserService;
 import vn.utc.hotelmanager.hotel.data.ResponseRepository;
 import vn.utc.hotelmanager.hotel.data.dto.response.HotelResponseDTO;
 import vn.utc.hotelmanager.hotel.model.Response;

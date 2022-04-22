@@ -6,17 +6,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import vn.utc.hotelmanager.auth.user.data.UserRepository;
 import vn.utc.hotelmanager.auth.user.model.User;
-import vn.utc.hotelmanager.auth.user.service.ApplicationUserService;
+import vn.utc.hotelmanager.utils.ApplicationUserService;
 import vn.utc.hotelmanager.exception.InvalidRequestException;
 import vn.utc.hotelmanager.exception.RepositoryAccessException;
 import vn.utc.hotelmanager.hotel.data.ReceiptRepository;
 import vn.utc.hotelmanager.hotel.data.ReceiptRoomRepository;
 import vn.utc.hotelmanager.hotel.data.RoomRepository;
+import vn.utc.hotelmanager.hotel.data.UserReceiptRepository;
 import vn.utc.hotelmanager.hotel.data.dto.BookingDTO;
 import vn.utc.hotelmanager.hotel.data.dto.BookingDetailsDTO;
+import vn.utc.hotelmanager.hotel.data.dto.request.BookingUpdateRequestDTO;
 import vn.utc.hotelmanager.hotel.model.Receipt;
 import vn.utc.hotelmanager.hotel.model.ReceiptRoom;
 import vn.utc.hotelmanager.hotel.model.Room;
+import vn.utc.hotelmanager.hotel.model.UserReceipt;
+import vn.utc.hotelmanager.hotel.utils.PaymentStateConstants;
 import vn.utc.hotelmanager.utils.DateUtils;
 
 import javax.transaction.Transactional;
@@ -35,14 +39,17 @@ public class BookingService {
     private final RoomRepository roomRepository;
     private final ReceiptRepository receiptRepository;
     private final ReceiptRoomRepository receiptRoomRepository;
+    private final UserReceiptRepository userReceiptRepository;
 
     @Autowired
     public BookingService(UserRepository userRepository, RoomRepository roomRepository,
-                          ReceiptRepository receiptRepository, ReceiptRoomRepository receiptRoomRepository) {
+                          ReceiptRepository receiptRepository, ReceiptRoomRepository receiptRoomRepository,
+                          UserReceiptRepository userReceiptRepository) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.receiptRepository = receiptRepository;
         this.receiptRoomRepository = receiptRoomRepository;
+        this.userReceiptRepository = userReceiptRepository;
     }
 
     public List<BookingDTO> getUserBookings() {
@@ -94,18 +101,25 @@ public class BookingService {
             receiptRooms.add(newReceiptRoom);
         }
 
-        User bookingUser = userRepository.findByUsername(ApplicationUserService.getCurrentUser().getUsername());
-        Receipt newReceipt = Receipt.builder()
-                .created_date(Instant.now())
-                .user(bookingUser)
-                .total_balance(balance)
-                .build();
-        receiptRepository.save(newReceipt);
-
-        for (ReceiptRoom receiptRoom : receiptRooms)
-            receiptRoom.setReceipt(newReceipt);
-
         try {
+            User bookingUser = userRepository.findByUsername(ApplicationUserService.getCurrentUser().getUsername());
+            Receipt newReceipt = Receipt.builder()
+                    .created_date(Instant.now())
+                    .total_balance(balance)
+                    .build();
+            receiptRepository.save(newReceipt);
+
+            UserReceipt userReceipt = UserReceipt.builder()
+                    .user(bookingUser)
+                    .receipt(newReceipt)
+                    .arrived(false)
+                    .paymentState(PaymentStateConstants.UNPAID.getValue())
+                    .build();
+            userReceiptRepository.save(userReceipt);
+
+            for (ReceiptRoom receiptRoom : receiptRooms)
+                receiptRoom.setReceipt(newReceipt);
+
             receiptRoomRepository.saveAll(receiptRooms);
         } catch (Exception e) {
             String msg = e.getMessage();
@@ -115,6 +129,50 @@ public class BookingService {
             throw new RepositoryAccessException(
                     String.format("Cannot book this room: %s", msg));
         }
+    }
+
+    public void guestHasArrived(BookingUpdateRequestDTO updateRequest) {
+        verifyUpdateRequest(updateRequest);
+
+        UserReceipt thisUserReceipt = userReceiptRepository.findByReceiptId(
+                updateRequest.getReceiptId()
+        ).orElseThrow(
+                () -> new ResourceNotFoundException(
+                        String.format("User receipt with id %d not found",
+                                updateRequest.getReceiptId())
+                )
+        );
+
+        if (!ApplicationUserService.currentUserHasAdminRole()) {
+            if (thisUserReceipt.getUser().getId() != updateRequest.getUserId())
+                throw new InvalidRequestException(
+                        String.format("Receipt with id %d does not belong to user with id %d",
+                                updateRequest.getReceiptId(), updateRequest.getUserId())
+                );
+        }
+
+        thisUserReceipt.setArrived(true);
+
+        try {
+            userReceiptRepository.save(thisUserReceipt);
+        } catch (Exception e) {
+            throw new RepositoryAccessException(
+                    String.format("Cannot set arrived state: %s", e.getMessage()));
+        }
+    }
+
+    private void verifyUpdateRequest(BookingUpdateRequestDTO updateRequest) {
+        if (updateRequest.getUserId() == null)
+            throw new InvalidRequestException("User id cannot be empty");
+
+        if (updateRequest.getUserId() < 0)
+            throw new InvalidRequestException("Invalid user id: cannot be less than zero");
+
+        if (updateRequest.getReceiptId() == null)
+            throw new InvalidRequestException("Receipt id cannot be empty");
+
+        if (updateRequest.getReceiptId() < 0)
+            throw new InvalidRequestException("Invalid receipt id: cannot be less than zero");
     }
 
     private void verifyBookingRequest(BookingDetailsDTO bookingDetail) {
