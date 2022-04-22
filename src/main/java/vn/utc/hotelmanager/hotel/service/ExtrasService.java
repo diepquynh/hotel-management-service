@@ -6,20 +6,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import vn.utc.hotelmanager.exception.InvalidRequestException;
 import vn.utc.hotelmanager.exception.RepositoryAccessException;
-import vn.utc.hotelmanager.hotel.data.ReceiptRepository;
-import vn.utc.hotelmanager.hotel.data.ReceiptRoomRepository;
-import vn.utc.hotelmanager.hotel.data.RoomRepository;
-import vn.utc.hotelmanager.hotel.data.ServiceRepository;
+import vn.utc.hotelmanager.hotel.data.*;
 import vn.utc.hotelmanager.hotel.data.dto.request.HotelServiceFilterRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.HotelServiceRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.response.HotelServiceResponseDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.ServiceRequestDTO;
 import vn.utc.hotelmanager.hotel.model.Receipt;
 import vn.utc.hotelmanager.hotel.model.ReceiptRoom;
+import vn.utc.hotelmanager.hotel.model.ReceiptRoomService;
 import vn.utc.hotelmanager.hotel.model.Room;
 
 import javax.transaction.Transactional;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,13 +29,15 @@ public class ExtrasService {
     private final ServiceRepository serviceRepository;
     private final ReceiptRepository receiptRepository;
     private final ReceiptRoomRepository receiptRoomRepository;
+    private final ReceiptRoomServiceRepository receiptRoomServiceRepository;
 
     @Autowired
-    public ExtrasService(RoomRepository roomRepository, ServiceRepository serviceRepository, ReceiptRepository receiptRepository, ReceiptRoomRepository receiptRoomRepository) {
+    public ExtrasService(RoomRepository roomRepository, ServiceRepository serviceRepository, ReceiptRepository receiptRepository, ReceiptRoomRepository receiptRoomRepository, ReceiptRoomServiceRepository receiptRoomServiceRepository) {
         this.roomRepository = roomRepository;
         this.serviceRepository = serviceRepository;
         this.receiptRepository = receiptRepository;
         this.receiptRoomRepository = receiptRoomRepository;
+        this.receiptRoomServiceRepository = receiptRoomServiceRepository;
     }
 
     public List<HotelServiceResponseDTO> getAllHotelServices() {
@@ -82,6 +84,7 @@ public class ExtrasService {
             );
 
         Receipt targetReceipt = targetReceiptRoom.getReceipt();
+        Set<ReceiptRoomService> receiptRoomServices = new HashSet<>();
         for (ServiceRequestDTO request : serviceRequest.getServiceRequests()) {
             vn.utc.hotelmanager.hotel.model.Service targetService =
                     serviceRepository.findById(request.getServiceId()).orElseThrow(
@@ -96,12 +99,20 @@ public class ExtrasService {
                                 request.getQuantity())
                 );
 
-            targetReceiptRoom.addService(targetService);
+            ReceiptRoomService targetReceiptRoomService =
+                    ReceiptRoomService.builder()
+                            .service(targetService)
+                            .quantity(request.getQuantity())
+                            .build();
+
+            receiptRoomServices.add(targetReceiptRoomService);
             targetReceipt.addTotalBalance(
                     targetService.getPrice() * request.getQuantity());
         }
 
         try {
+            receiptRoomServiceRepository.saveAll(receiptRoomServices);
+            targetReceiptRoom.setReceiptRoomServices(receiptRoomServices);
             receiptRoomRepository.save(targetReceiptRoom);
             receiptRepository.save(targetReceipt);
         } catch (Exception e) {

@@ -28,10 +28,10 @@ public class ReceiptRoom {
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
-    @ManyToMany(mappedBy = "receiptRooms")
+    @OneToMany(mappedBy = "receiptRoom")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private Set<Service> services;
+    private Set<ReceiptRoomService> receiptRoomServices;
 
     @Column(name = "arrival_time")
     private Instant arrivalTime;
@@ -47,7 +47,7 @@ public class ReceiptRoom {
         return currentTime.isAfter(arrivalTime) && currentTime.isBefore(leaveTime);
     }
 
-    public void addService(Service service) {
-        services.add(service);
+    public void addReceiptRoomService(ReceiptRoomService receiptRoomService) {
+        receiptRoomServices.add(receiptRoomService);
     }
 }

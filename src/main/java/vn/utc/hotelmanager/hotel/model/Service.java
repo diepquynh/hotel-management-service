@@ -28,13 +28,8 @@ public class Service {
     @Column(name = "image", length = 256)
     private String image;
 
+    @OneToMany(mappedBy = "service")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "receipts_rooms_services",
-            joinColumns = @JoinColumn(name = "service_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "receipt_room_id", referencedColumnName = "id")
-    )
-    private Set<ReceiptRoom> receiptRooms;
+    private Set<ReceiptRoomService> receiptRoomServices;
 }
