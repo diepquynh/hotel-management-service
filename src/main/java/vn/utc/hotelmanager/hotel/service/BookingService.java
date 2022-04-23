@@ -12,7 +12,7 @@ import vn.utc.hotelmanager.exception.RepositoryAccessException;
 import vn.utc.hotelmanager.hotel.data.ReceiptRepository;
 import vn.utc.hotelmanager.hotel.data.ReceiptRoomRepository;
 import vn.utc.hotelmanager.hotel.data.RoomRepository;
-import vn.utc.hotelmanager.hotel.data.UserReceiptRepository;
+import vn.utc.hotelmanager.hotel.data.BookingRepository;
 import vn.utc.hotelmanager.hotel.data.dto.BookingDTO;
 import vn.utc.hotelmanager.hotel.data.dto.BookingDetailsDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.BookingUpdateRequestDTO;
@@ -39,23 +39,28 @@ public class BookingService {
     private final RoomRepository roomRepository;
     private final ReceiptRepository receiptRepository;
     private final ReceiptRoomRepository receiptRoomRepository;
-    private final UserReceiptRepository userReceiptRepository;
+    private final BookingRepository bookingRepository;
 
     @Autowired
     public BookingService(UserRepository userRepository, RoomRepository roomRepository,
                           ReceiptRepository receiptRepository, ReceiptRoomRepository receiptRoomRepository,
-                          UserReceiptRepository userReceiptRepository) {
+                          BookingRepository bookingRepository) {
         this.userRepository = userRepository;
         this.roomRepository = roomRepository;
         this.receiptRepository = receiptRepository;
         this.receiptRoomRepository = receiptRoomRepository;
-        this.userReceiptRepository = userReceiptRepository;
+        this.bookingRepository = bookingRepository;
+    }
+
+    public List<BookingDTO> getAllBookings() {
+        return bookingRepository.findAll().stream().map(BookingDTO::new)
+                .collect(Collectors.toList());
     }
 
     public List<BookingDTO> getUserBookings() {
         List<BookingDTO> bookingDTOS = new ArrayList<>();
 
-        List<Receipt> userReceipts = receiptRepository.findReceiptsByUsername(
+        List<Booking> userReceipts = bookingRepository.findBookingsByUsername(
                 ApplicationUserService.getCurrentUser().getUsername()
         );
 
@@ -115,7 +120,7 @@ public class BookingService {
                     .arrived(false)
                     .paymentState(PaymentStateConstants.UNPAID.getValue())
                     .build();
-            userReceiptRepository.save(booking);
+            bookingRepository.save(booking);
 
             for (ReceiptRoom receiptRoom : receiptRooms)
                 receiptRoom.setReceipt(newReceipt);
@@ -134,7 +139,7 @@ public class BookingService {
     public void guestHasArrived(BookingUpdateRequestDTO updateRequest) {
         verifyUpdateRequest(updateRequest);
 
-        Booking thisBooking = userReceiptRepository.findByReceiptId(
+        Booking thisBooking = bookingRepository.findByReceiptId(
                 updateRequest.getReceiptId()
         ).orElseThrow(
                 () -> new ResourceNotFoundException(
@@ -154,7 +159,7 @@ public class BookingService {
         thisBooking.setArrived(true);
 
         try {
-            userReceiptRepository.save(thisBooking);
+            bookingRepository.save(thisBooking);
         } catch (Exception e) {
             throw new RepositoryAccessException(
                     String.format("Cannot set arrived state: %s", e.getMessage()));

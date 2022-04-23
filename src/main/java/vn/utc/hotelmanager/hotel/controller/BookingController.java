@@ -23,6 +23,12 @@ public class BookingController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<List<BookingDTO>> getAllBookings() {
+        return new ResponseEntity<>(bookingService.getAllBookings(), HttpStatus.OK);
+    }
+
+    @GetMapping("/user-bookings")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<List<BookingDTO>> getUserBookings() {
         return new ResponseEntity<>(bookingService.getUserBookings(), HttpStatus.OK);
