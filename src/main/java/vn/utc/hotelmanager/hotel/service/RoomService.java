@@ -12,10 +12,12 @@ import vn.utc.hotelmanager.hotel.data.RoomTypeRepository;
 import vn.utc.hotelmanager.hotel.data.dto.request.RoomFilterRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.RoomRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.response.RoomResponseDTO;
+import vn.utc.hotelmanager.hotel.model.ReceiptRoom;
 import vn.utc.hotelmanager.hotel.model.Room;
 import vn.utc.hotelmanager.hotel.model.RoomType;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -126,6 +128,11 @@ public class RoomService {
                         String.format("Room with id %d does not exist", roomId)
                 )
         );
+
+        // Check if the target room has someone living
+        ReceiptRoom receiptRoom = room.getActiveReceiptRoom();
+        if (receiptRoom != null && receiptRoom.getReceipt().getBooking().getArrived().equals(true))
+            throw new InvalidRequestException("Someone is currently living this room. Please try again later");
 
         try {
             roomRepository.delete(room);

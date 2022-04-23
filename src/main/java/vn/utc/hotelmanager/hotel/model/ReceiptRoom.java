@@ -43,7 +43,7 @@ public class ReceiptRoom {
     private Integer capacity;
 
     public boolean isRoomReceiptActive() {
-        Instant currentTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
+        Instant currentTime = Instant.now();
         return currentTime.isAfter(arrivalTime) && currentTime.isBefore(leaveTime);
     }
 
