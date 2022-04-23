@@ -11,6 +11,7 @@ import vn.utc.hotelmanager.hotel.data.ResponseRepository;
 import vn.utc.hotelmanager.hotel.data.dto.response.HotelResponseDTO;
 import vn.utc.hotelmanager.hotel.model.Response;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,7 @@ public class ResponseService {
         User currentUser = userRepository.findByUsername(currentUsername);
 
         Response newResponse = Response.builder()
-                .content(content)
+                .content(Base64.getEncoder().encodeToString(content.getBytes()))
                 .user(currentUser)
                 .build();
 
