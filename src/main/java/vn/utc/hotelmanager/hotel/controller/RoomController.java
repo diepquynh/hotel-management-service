@@ -75,4 +75,11 @@ public class RoomController {
         roomService.updateRoom(roomId, roomRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @DeleteMapping("/{roomId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteRoom(@PathVariable("roomId") Integer roomId) {
+        roomService.deleteRoom(roomId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

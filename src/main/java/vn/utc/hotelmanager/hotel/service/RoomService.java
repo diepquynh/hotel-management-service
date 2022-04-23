@@ -120,6 +120,20 @@ public class RoomService {
         }
     }
 
+    public void deleteRoom(Integer roomId) {
+        Room room = roomRepository.findById(roomId).orElseThrow(
+                () -> new ResourceNotFoundException(
+                        String.format("Room with id %d does not exist", roomId)
+                )
+        );
+
+        try {
+            roomRepository.delete(room);
+        } catch (Exception e) {
+            throw new RepositoryAccessException("Cannot delete this room: " + e.getMessage());
+        }
+    }
+
     private void verifyCreateRequest(RoomRequestDTO roomRequest) {
         if (roomRequest.getRoomTypeId() == null)
             throw new InvalidRequestException("Room type cannot be empty");
