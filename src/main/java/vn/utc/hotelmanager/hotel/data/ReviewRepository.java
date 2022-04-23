@@ -3,16 +3,16 @@ package vn.utc.hotelmanager.hotel.data;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import vn.utc.hotelmanager.hotel.model.Response;
+import vn.utc.hotelmanager.hotel.model.Review;
 
 import java.util.List;
 
-public interface ResponseRepository extends JpaRepository<Response, Integer> {
+public interface ReviewRepository extends JpaRepository<Review, Integer> {
 
     @Query(value = "select" +
-            "r.* from responses r " +
-            "join users_responses ur on r.id = ur.response_id " +
+            "r.* from reviews r " +
+            "join users_reviews ur on r.id = ur.review_id " +
             "join users u on u.id = ur.user_id " +
             "where u.username = :username", nativeQuery = true)
-    List<Response> findAllByUsername(@Param("username") String username);
+    List<Review> findAllByUsername(@Param("username") String username);
 }

@@ -13,8 +13,8 @@ import javax.persistence.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "responses")
-public class Response {
+@Table(name = "reviews")
+public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -25,8 +25,8 @@ public class Response {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinTable(
-            name = "users_responses",
-            joinColumns = @JoinColumn(name = "response_id", referencedColumnName = "id"),
+            name = "users_reviews",
+            joinColumns = @JoinColumn(name = "review_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id")
     )
     private User user;

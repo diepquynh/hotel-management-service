@@ -7,55 +7,55 @@ import vn.utc.hotelmanager.exception.RepositoryAccessException;
 import vn.utc.hotelmanager.auth.user.data.UserRepository;
 import vn.utc.hotelmanager.auth.user.model.User;
 import vn.utc.hotelmanager.utils.ApplicationUserService;
-import vn.utc.hotelmanager.hotel.data.ResponseRepository;
-import vn.utc.hotelmanager.hotel.data.dto.response.HotelResponseDTO;
-import vn.utc.hotelmanager.hotel.model.Response;
+import vn.utc.hotelmanager.hotel.data.ReviewRepository;
+import vn.utc.hotelmanager.hotel.data.dto.response.HotelReviewDTO;
+import vn.utc.hotelmanager.hotel.model.Review;
 
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class ResponseService {
+public class HotelReviewsService {
 
-    private final ResponseRepository responseRepository;
+    private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
 
     @Autowired
-    public ResponseService(ResponseRepository responseRepository, UserRepository userRepository) {
-        this.responseRepository = responseRepository;
+    public HotelReviewsService(ReviewRepository reviewRepository, UserRepository userRepository) {
+        this.reviewRepository = reviewRepository;
         this.userRepository = userRepository;
     }
 
-    public List<HotelResponseDTO> getAllUserResponses() {
-        return responseRepository.findAll()
-                .stream().map(HotelResponseDTO::new)
+    public List<HotelReviewDTO> getAllUserReviews() {
+        return reviewRepository.findAll()
+                .stream().map(HotelReviewDTO::new)
                 .collect(Collectors.toList());
     }
 
-    public List<HotelResponseDTO> getUserResponses() {
+    public List<HotelReviewDTO> getUserReviews() {
         String currentUsername = ApplicationUserService.getCurrentUser().getUsername();
-        return responseRepository.findAllByUsername(currentUsername)
-                .stream().map(HotelResponseDTO::new)
+        return reviewRepository.findAllByUsername(currentUsername)
+                .stream().map(HotelReviewDTO::new)
                 .collect(Collectors.toList());
     }
 
-    public void createUserResponse(String content) {
+    public void createUserReview(String content) {
         if (content == null || content.trim().isEmpty())
-            throw new InvalidRequestException("Response content cannot be empty!");
+            throw new InvalidRequestException("Review content cannot be empty!");
 
         String currentUsername = ApplicationUserService.getCurrentUser().getUsername();
         User currentUser = userRepository.findByUsername(currentUsername);
 
-        Response newResponse = Response.builder()
+        Review newReview = Review.builder()
                 .content(Base64.getEncoder().encodeToString(content.getBytes()))
                 .user(currentUser)
                 .build();
 
         try {
-            responseRepository.save(newResponse);
+            reviewRepository.save(newReview);
         } catch (Exception e) {
-            throw new RepositoryAccessException("Cannot save this response: " + e.getMessage());
+            throw new RepositoryAccessException("Cannot save this review: " + e.getMessage());
         }
     }
 }
