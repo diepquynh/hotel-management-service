@@ -6,16 +6,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import vn.utc.hotelmanager.exception.InvalidRequestException;
 import vn.utc.hotelmanager.exception.RepositoryAccessException;
+import vn.utc.hotelmanager.exception.ResourceAlreadyExistedException;
 import vn.utc.hotelmanager.hotel.data.*;
 import vn.utc.hotelmanager.hotel.data.dto.request.HotelServiceFilterRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.HotelServiceRequestDTO;
-import vn.utc.hotelmanager.hotel.data.dto.response.HotelServiceResponseDTO;
+import vn.utc.hotelmanager.hotel.data.dto.HotelServiceItemDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.ServiceRequestDTO;
 import vn.utc.hotelmanager.hotel.model.*;
 
 import javax.transaction.Transactional;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,27 +41,107 @@ public class ExtrasService {
         this.receiptRoomServiceRepository = receiptRoomServiceRepository;
     }
 
-    public List<HotelServiceResponseDTO> getAllHotelServices() {
+    public List<HotelServiceItemDTO> getAllHotelServices() {
         return serviceRepository.findAll()
-                .stream().map(HotelServiceResponseDTO::new)
+                .stream().map(HotelServiceItemDTO::new)
                 .collect(Collectors.toList());
     }
 
-    public List<HotelServiceResponseDTO> getFilteredHotelServices(
+    public List<HotelServiceItemDTO> getFilteredHotelServices(
             HotelServiceFilterRequestDTO serviceRequest) {
         verifyFilterRequest(serviceRequest);
 
         return serviceRepository.findFilteredServices(serviceRequest)
-                .stream().map(HotelServiceResponseDTO::new)
+                .stream().map(HotelServiceItemDTO::new)
                 .collect(Collectors.toList());
     }
 
-    public HotelServiceResponseDTO getHotelService(Integer id) {
+    public HotelServiceItemDTO getHotelService(Integer id) {
         return serviceRepository.findById(id)
-                .map(HotelServiceResponseDTO::new)
+                .map(HotelServiceItemDTO::new)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         String.format("Hotel service with id %d not found", id)
                 ));
+    }
+
+    public void addService(HotelServiceItemDTO serviceItem) {
+        verifyServiceItemRequest(serviceItem);
+        Optional.ofNullable(
+                serviceRepository.findByName(serviceItem.getName().trim())
+        ).orElseThrow(
+                () -> new ResourceAlreadyExistedException(
+                        String.format("Service with name %s already existed",
+                                serviceItem.getName())
+                )
+        );
+
+        vn.utc.hotelmanager.hotel.model.Service service =
+                vn.utc.hotelmanager.hotel.model.Service.builder()
+                        .name(serviceItem.getName())
+                        .price(serviceItem.getPrice())
+                        .type(serviceItem.getType())
+                        .image(serviceItem.getImage())
+                        .build();
+
+        try {
+            serviceRepository.save(service);
+        } catch (Exception e) {
+            throw new RepositoryAccessException(
+                    String.format("Unable to add service: %s", e.getMessage())
+            );
+        }
+    }
+
+    public void updateService(HotelServiceItemDTO serviceItem) {
+        verifyServiceItemRequest(serviceItem);
+        if (serviceItem.getId() == null)
+            throw new InvalidRequestException("Service id cannot be null!");
+
+        if (serviceItem.getId() < 0)
+            throw new InvalidRequestException("Invalid service id: cannot be less than zero!");
+
+        vn.utc.hotelmanager.hotel.model.Service targetService =
+                serviceRepository.findById(serviceItem.getId())
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        String.format("Hotel service with id %d not found",
+                                                serviceItem.getId())
+                                )
+                        );
+
+        targetService.setName(serviceItem.getName());
+        targetService.setPrice(serviceItem.getPrice());
+        targetService.setType(serviceItem.getType());
+        targetService.setImage(serviceItem.getImage());
+
+        try {
+            serviceRepository.save(targetService);
+        } catch (Exception e) {
+            throw new RepositoryAccessException(
+                    String.format("Unable to update service with id %d: %s",
+                            targetService.getId(), e.getMessage())
+            );
+        }
+    }
+
+    public void deleteService(Integer serviceId) {
+        vn.utc.hotelmanager.hotel.model.Service targetService =
+                serviceRepository.findById(serviceId)
+                        .orElseThrow(
+                                () -> new ResourceNotFoundException(
+                                        String.format("Hotel service with id %d not found",
+                                                serviceId)
+                                )
+                        );
+
+        try {
+            serviceRepository.delete(targetService);
+        } catch (Exception e) {
+            throw new RepositoryAccessException(
+                    String.format("Unable to delete service with id %d: %s",
+                            targetService.getId(), e.getMessage())
+            );
+        }
     }
 
     @Transactional
@@ -128,6 +210,20 @@ public class ExtrasService {
                             serviceRequest.getRoomId(), e.getMessage())
             );
         }
+    }
+
+    private void verifyServiceItemRequest(HotelServiceItemDTO serviceItem) {
+        if (serviceItem.getName() == null)
+            throw new InvalidRequestException("Service name cannot be null!");
+
+        if (serviceItem.getPrice() == null)
+            throw new InvalidRequestException("Service price cannot be null!");
+
+        if (serviceItem.getPrice() < 0)
+            throw new InvalidRequestException("Invalid service price: cannot be less than zero!");
+
+        if (serviceItem.getType() == null)
+            throw new InvalidRequestException("Service type cannot be null!");
     }
 
     private void verifyFilterRequest(HotelServiceFilterRequestDTO serviceRequest) {

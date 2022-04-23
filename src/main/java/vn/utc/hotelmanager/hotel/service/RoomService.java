@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import vn.utc.hotelmanager.exception.InvalidRequestException;
 import vn.utc.hotelmanager.exception.RepositoryAccessException;
-import vn.utc.hotelmanager.exception.RoomAlreadyExistedException;
+import vn.utc.hotelmanager.exception.ResourceAlreadyExistedException;
 import vn.utc.hotelmanager.hotel.data.RoomRepository;
 import vn.utc.hotelmanager.hotel.data.RoomTypeRepository;
 import vn.utc.hotelmanager.hotel.data.dto.request.RoomFilterRequestDTO;
@@ -17,7 +17,6 @@ import vn.utc.hotelmanager.hotel.model.Room;
 import vn.utc.hotelmanager.hotel.model.RoomType;
 
 import javax.transaction.Transactional;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -154,7 +153,7 @@ public class RoomService {
         Optional.ofNullable(
                 roomRepository.findByName(roomRequest.getName())
         ).orElseThrow(
-                () -> new RoomAlreadyExistedException(
+                () -> new ResourceAlreadyExistedException(
                         String.format("Room with name %s already existed", roomRequest.getName())
                 )
         );

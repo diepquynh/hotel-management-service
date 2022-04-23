@@ -7,7 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.utc.hotelmanager.hotel.data.dto.request.HotelServiceFilterRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.HotelServiceRequestDTO;
-import vn.utc.hotelmanager.hotel.data.dto.response.HotelServiceResponseDTO;
+import vn.utc.hotelmanager.hotel.data.dto.HotelServiceItemDTO;
 import vn.utc.hotelmanager.hotel.service.ExtrasService;
 
 import java.util.List;
@@ -24,22 +24,43 @@ public class HotelServiceController {
     }
 
     @GetMapping
-    public ResponseEntity<List<HotelServiceResponseDTO>> getAllServices() {
+    public ResponseEntity<List<HotelServiceItemDTO>> getAllServices() {
         return new ResponseEntity<>(extrasService.getAllHotelServices(), HttpStatus.OK);
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<List<HotelServiceResponseDTO>> getServicesFiltered(
+    public ResponseEntity<List<HotelServiceItemDTO>> getServicesFiltered(
             @RequestBody HotelServiceFilterRequestDTO serviceRequest) {
         return new ResponseEntity<>(extrasService.getFilteredHotelServices(serviceRequest), HttpStatus.OK);
     }
 
     @GetMapping("/{serviceId}")
-    public ResponseEntity<HotelServiceResponseDTO> getHotelService(@PathVariable("serviceId") Integer serviceId) {
+    public ResponseEntity<HotelServiceItemDTO> getHotelService(@PathVariable("serviceId") Integer serviceId) {
         return new ResponseEntity<>(extrasService.getHotelService(serviceId), HttpStatus.OK);
     }
 
+    @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> addService(@RequestBody HotelServiceItemDTO serviceItem) {
+        extrasService.addService(serviceItem);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
     @PutMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> updateService(@RequestBody HotelServiceItemDTO serviceItem) {
+        extrasService.updateService(serviceItem);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @DeleteMapping("/{serviceId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteService(@PathVariable("serviceId") Integer serviceId) {
+        extrasService.deleteService(serviceId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PutMapping("/request-for-room")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Void> requestServiceForRoom(@RequestBody HotelServiceRequestDTO serviceRequest) {
         extrasService.requestServiceForRoom(serviceRequest);

@@ -1,17 +1,19 @@
-package vn.utc.hotelmanager.hotel.data.dto.response;
+package vn.utc.hotelmanager.hotel.data.dto;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import vn.utc.hotelmanager.hotel.model.Service;
 
 @Data
-public class HotelServiceResponseDTO {
+@NoArgsConstructor
+public class HotelServiceItemDTO {
     private Integer id;
     private String name;
     private Double price;
     private String type;
     private String image;
 
-    public HotelServiceResponseDTO(Service service) {
+    public HotelServiceItemDTO(Service service) {
         setId(service.getId());
         setName(service.getName());
         setPrice(service.getPrice());
