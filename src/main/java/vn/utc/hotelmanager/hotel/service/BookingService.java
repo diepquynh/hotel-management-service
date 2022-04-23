@@ -19,7 +19,7 @@ import vn.utc.hotelmanager.hotel.data.dto.request.BookingUpdateRequestDTO;
 import vn.utc.hotelmanager.hotel.model.Receipt;
 import vn.utc.hotelmanager.hotel.model.ReceiptRoom;
 import vn.utc.hotelmanager.hotel.model.Room;
-import vn.utc.hotelmanager.hotel.model.UserReceipt;
+import vn.utc.hotelmanager.hotel.model.Booking;
 import vn.utc.hotelmanager.hotel.utils.PaymentStateConstants;
 import vn.utc.hotelmanager.utils.DateUtils;
 
@@ -109,13 +109,13 @@ public class BookingService {
                     .build();
             receiptRepository.save(newReceipt);
 
-            UserReceipt userReceipt = UserReceipt.builder()
+            Booking booking = Booking.builder()
                     .user(bookingUser)
                     .receipt(newReceipt)
                     .arrived(false)
                     .paymentState(PaymentStateConstants.UNPAID.getValue())
                     .build();
-            userReceiptRepository.save(userReceipt);
+            userReceiptRepository.save(booking);
 
             for (ReceiptRoom receiptRoom : receiptRooms)
                 receiptRoom.setReceipt(newReceipt);
@@ -134,7 +134,7 @@ public class BookingService {
     public void guestHasArrived(BookingUpdateRequestDTO updateRequest) {
         verifyUpdateRequest(updateRequest);
 
-        UserReceipt thisUserReceipt = userReceiptRepository.findByReceiptId(
+        Booking thisBooking = userReceiptRepository.findByReceiptId(
                 updateRequest.getReceiptId()
         ).orElseThrow(
                 () -> new ResourceNotFoundException(
@@ -144,17 +144,17 @@ public class BookingService {
         );
 
         if (!ApplicationUserService.currentUserHasAdminRole()) {
-            if (thisUserReceipt.getUser().getId() != updateRequest.getUserId())
+            if (thisBooking.getUser().getId() != updateRequest.getUserId())
                 throw new InvalidRequestException(
                         String.format("Receipt with id %d does not belong to user with id %d",
                                 updateRequest.getReceiptId(), updateRequest.getUserId())
                 );
         }
 
-        thisUserReceipt.setArrived(true);
+        thisBooking.setArrived(true);
 
         try {
-            userReceiptRepository.save(thisUserReceipt);
+            userReceiptRepository.save(thisBooking);
         } catch (Exception e) {
             throw new RepositoryAccessException(
                     String.format("Cannot set arrived state: %s", e.getMessage()));

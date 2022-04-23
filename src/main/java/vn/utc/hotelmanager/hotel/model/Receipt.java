@@ -32,7 +32,7 @@ public class Receipt {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "receipt", orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    private UserReceipt userReceipt;
+    private Booking booking;
 
     public void addTotalBalance(Double extraBalance) {
         total_balance += extraBalance;
