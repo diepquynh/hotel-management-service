@@ -11,10 +11,7 @@ import vn.utc.hotelmanager.hotel.data.dto.request.HotelServiceFilterRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.HotelServiceRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.response.HotelServiceResponseDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.ServiceRequestDTO;
-import vn.utc.hotelmanager.hotel.model.Receipt;
-import vn.utc.hotelmanager.hotel.model.ReceiptRoom;
-import vn.utc.hotelmanager.hotel.model.ReceiptRoomService;
-import vn.utc.hotelmanager.hotel.model.Room;
+import vn.utc.hotelmanager.hotel.model.*;
 
 import javax.transaction.Transactional;
 import java.util.HashSet;
@@ -86,6 +83,13 @@ public class ExtrasService {
             );
 
         Receipt targetReceipt = targetReceiptRoom.getReceipt();
+        Booking targetBooking = targetReceipt.getBooking();
+        if (targetBooking.getArrived().equals(false))
+            throw new InvalidRequestException(
+                    String.format("Room with id %d has no guest arrived",
+                            serviceRequest.getRoomId())
+            );
+
         Set<ReceiptRoomService> receiptRoomServices = new HashSet<>();
         for (ServiceRequestDTO request : serviceRequest.getServiceRequests()) {
             vn.utc.hotelmanager.hotel.model.Service targetService =
