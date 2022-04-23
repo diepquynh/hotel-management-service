@@ -11,6 +11,7 @@ import vn.utc.hotelmanager.hotel.data.ReviewRepository;
 import vn.utc.hotelmanager.hotel.data.dto.response.HotelReviewDTO;
 import vn.utc.hotelmanager.hotel.model.Review;
 
+import java.time.Instant;
 import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,6 +49,7 @@ public class HotelReviewsService {
         User currentUser = userRepository.findByUsername(currentUsername);
 
         Review newReview = Review.builder()
+                .created_date(Instant.now())
                 .content(Base64.getEncoder().encodeToString(content.getBytes()))
                 .user(currentUser)
                 .build();

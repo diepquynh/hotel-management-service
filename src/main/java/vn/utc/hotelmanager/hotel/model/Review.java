@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import vn.utc.hotelmanager.auth.user.model.User;
 
 import javax.persistence.*;
+import java.time.Instant;
 
 @Entity
 @Data
@@ -19,6 +20,9 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
+
+    @Column(name = "created_date")
+    private Instant created_date;
 
     @Column(name = "content", nullable = false, length = 512)
     private String content;
