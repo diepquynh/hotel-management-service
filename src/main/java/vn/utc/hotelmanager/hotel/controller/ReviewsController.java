@@ -34,4 +34,11 @@ public class ReviewsController {
         hotelReviewsService.createUserReview(userReview.getContent());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @DeleteMapping("/{reviewId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteUserReview(@PathVariable("reviewId") Integer reviewId) {
+        hotelReviewsService.deleteUserReview(reviewId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

@@ -1,6 +1,7 @@
 package vn.utc.hotelmanager.hotel.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import vn.utc.hotelmanager.exception.InvalidRequestException;
 import vn.utc.hotelmanager.exception.RepositoryAccessException;
@@ -58,6 +59,26 @@ public class HotelReviewsService {
             reviewRepository.save(newReview);
         } catch (Exception e) {
             throw new RepositoryAccessException("Cannot save this review: " + e.getMessage());
+        }
+    }
+
+    public void deleteUserReview(Integer reviewId) {
+        if (reviewId < 0)
+            throw new InvalidRequestException("Invalid review id: value cannot be less than zero");
+
+        Review userReview = reviewRepository.findById(reviewId).orElseThrow(
+                () -> new ResourceNotFoundException(
+                        String.format("Review with id %d does not exist", reviewId)
+                )
+        );
+
+        try {
+            reviewRepository.delete(userReview);
+        } catch (Exception e) {
+            throw new RepositoryAccessException(
+                    String.format("Unable to delete review with id %d: %s",
+                            reviewId, e.getMessage())
+            );
         }
     }
 }
