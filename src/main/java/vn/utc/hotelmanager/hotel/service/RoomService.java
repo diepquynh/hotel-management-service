@@ -141,15 +141,6 @@ public class RoomService {
     }
 
     private void verifyCreateRequest(RoomRequestDTO roomRequest) {
-        if (roomRequest.getRoomTypeId() == null)
-            throw new InvalidRequestException("Room type cannot be empty");
-
-        if (roomRequest.getRoomTypeId() < 0)
-            throw new InvalidRequestException("Invalid room id: value cannot be less than zero");
-
-        if (roomRequest.getName() == null || roomRequest.getName().trim().isEmpty())
-            throw new InvalidRequestException("Room name cannot be empty");
-
         Optional.ofNullable(
                 roomRepository.findByName(roomRequest.getName())
         ).orElseThrow(
@@ -168,29 +159,9 @@ public class RoomService {
                     );
         }
 
-        if (roomRequest.getPriceFrom() != null) {
-            if (roomRequest.getPriceFrom() < 0)
-                throw new InvalidRequestException("Price range start cannot be less than zero");
-        }
-
-        if (roomRequest.getPriceTo() != null) {
-            if (roomRequest.getPriceTo() < 0)
-                throw new InvalidRequestException("Price range end cannot be less than zero");
-        }
-
         if (roomRequest.getPriceFrom() != null && roomRequest.getPriceTo() != null) {
             if (roomRequest.getPriceFrom() > roomRequest.getPriceTo())
                 throw new InvalidRequestException("Invalid price range: priceFrom > priceTo");
-        }
-
-        if (roomRequest.getSeatCountFrom() != null) {
-            if (roomRequest.getSeatCountFrom() < 0)
-                throw new InvalidRequestException("Seat count range start cannot be less than zero");
-        }
-
-        if (roomRequest.getSeatCountTo() != null) {
-            if (roomRequest.getSeatCountTo() < 0)
-                throw new InvalidRequestException("Seat count range start cannot be less than zero");
         }
 
         if (roomRequest.getSeatCountFrom() != null && roomRequest.getSeatCountTo() != null) {

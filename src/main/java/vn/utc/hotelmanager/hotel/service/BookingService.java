@@ -137,8 +137,6 @@ public class BookingService {
     }
 
     public void guestHasArrived(BookingUpdateRequestDTO updateRequest) {
-        verifyUpdateRequest(updateRequest);
-
         Booking thisBooking = bookingRepository.findByReceiptId(
                 updateRequest.getReceiptId()
         ).orElseThrow(
@@ -166,43 +164,11 @@ public class BookingService {
         }
     }
 
-    private void verifyUpdateRequest(BookingUpdateRequestDTO updateRequest) {
-        if (updateRequest.getUserId() == null)
-            throw new InvalidRequestException("User id cannot be empty");
-
-        if (updateRequest.getUserId() < 0)
-            throw new InvalidRequestException("Invalid user id: cannot be less than zero");
-
-        if (updateRequest.getReceiptId() == null)
-            throw new InvalidRequestException("Receipt id cannot be empty");
-
-        if (updateRequest.getReceiptId() < 0)
-            throw new InvalidRequestException("Invalid receipt id: cannot be less than zero");
-    }
-
     private void verifyBookingRequest(BookingDetailsDTO bookingDetail) {
-        if (bookingDetail.getRoomId() == null)
-            throw new InvalidRequestException("Room id cannot be null");
-
-        if (bookingDetail.getRoomId() < 0)
-            throw new InvalidRequestException("Invalid room id: cannot be negative");
-
         LocalDateTime startDate = bookingDetail.getStartDate();
         LocalDateTime endDate = bookingDetail.getEndDate();
 
-        if (startDate == null)
-            throw new InvalidRequestException("Booking start date cannot be empty");
-
-        if (endDate == null)
-            throw new InvalidRequestException("Booking end date cannot be empty");
-
         if (startDate.isAfter(endDate))
             throw new InvalidRequestException("Booking start date cannot be behind end date");
-
-        if (bookingDetail.getCapacity() == null)
-            throw new InvalidRequestException("Capacity cannot be empty");
-
-        if (bookingDetail.getCapacity() < 0)
-            throw new InvalidRequestException("Invalid capacity size: cannot be less than zero");
     }
 }

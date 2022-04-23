@@ -11,6 +11,7 @@ import vn.utc.hotelmanager.hotel.data.dto.request.RoomRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.response.RoomResponseDTO;
 import vn.utc.hotelmanager.hotel.service.RoomService;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -34,7 +35,7 @@ public class RoomController {
 
     @GetMapping("/filter")
     public ResponseEntity<List<RoomResponseDTO>> getFilteredRooms(
-            @RequestBody RoomFilterRequestDTO roomRequest) {
+            @Valid @RequestBody RoomFilterRequestDTO roomRequest) {
         return new ResponseEntity<>(roomService.getFilteredRooms(roomRequest), HttpStatus.OK);
     }
 
@@ -50,7 +51,7 @@ public class RoomController {
 
     @GetMapping("/available")
     public ResponseEntity<List<RoomResponseDTO>> getAvailableRoomsBetweenTime(
-            @RequestBody AvailableRoomRequestDTO roomRequest) {
+            @Valid @RequestBody AvailableRoomRequestDTO roomRequest) {
         return new ResponseEntity<>(
                 roomService.getAvailableRoomsForDateRange(
                         roomRequest.getStartDate(), roomRequest.getEndDate()), HttpStatus.OK);
@@ -63,15 +64,15 @@ public class RoomController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> createRoom(@RequestBody RoomRequestDTO roomRequest) {
+    public ResponseEntity<Void> createRoom(@Valid @RequestBody RoomRequestDTO roomRequest) {
         roomService.createRoom(roomRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{roomId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> updateRoom(@PathVariable Integer roomId,
-                                           @RequestBody RoomRequestDTO roomRequest) {
+    public ResponseEntity<Void> updateRoom(@PathVariable("roomId") Integer roomId,
+                                           @Valid @RequestBody RoomRequestDTO roomRequest) {
         roomService.updateRoom(roomId, roomRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

@@ -9,6 +9,7 @@ import vn.utc.hotelmanager.hotel.data.dto.BookingDTO;
 import vn.utc.hotelmanager.hotel.data.dto.request.BookingUpdateRequestDTO;
 import vn.utc.hotelmanager.hotel.service.BookingService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -36,14 +37,16 @@ public class BookingController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<Void> bookThisRoom(@RequestBody BookingDTO bookingRequest) {
+    public ResponseEntity<Void> bookThisRoom(
+            @Valid @RequestBody BookingDTO bookingRequest) {
         bookingService.BookThisRoom(bookingRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/arrived")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<Void> guestHasArrived(@RequestBody BookingUpdateRequestDTO updateRequest) {
+    public ResponseEntity<Void> guestHasArrived(
+            @Valid @RequestBody BookingUpdateRequestDTO updateRequest) {
         bookingService.guestHasArrived(updateRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

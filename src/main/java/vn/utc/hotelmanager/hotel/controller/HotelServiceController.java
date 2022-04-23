@@ -10,6 +10,7 @@ import vn.utc.hotelmanager.hotel.data.dto.request.HotelServiceRequestDTO;
 import vn.utc.hotelmanager.hotel.data.dto.HotelServiceItemDTO;
 import vn.utc.hotelmanager.hotel.service.ExtrasService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -30,7 +31,7 @@ public class HotelServiceController {
 
     @GetMapping("/filter")
     public ResponseEntity<List<HotelServiceItemDTO>> getServicesFiltered(
-            @RequestBody HotelServiceFilterRequestDTO serviceRequest) {
+            @Valid @RequestBody HotelServiceFilterRequestDTO serviceRequest) {
         return new ResponseEntity<>(extrasService.getFilteredHotelServices(serviceRequest), HttpStatus.OK);
     }
 
@@ -41,14 +42,16 @@ public class HotelServiceController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> addService(@RequestBody HotelServiceItemDTO serviceItem) {
+    public ResponseEntity<Void> addService(
+            @Valid @RequestBody HotelServiceItemDTO serviceItem) {
         extrasService.addService(serviceItem);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> updateService(@RequestBody HotelServiceItemDTO serviceItem) {
+    public ResponseEntity<Void> updateService(
+            @Valid @RequestBody HotelServiceItemDTO serviceItem) {
         extrasService.updateService(serviceItem);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
@@ -62,7 +65,8 @@ public class HotelServiceController {
 
     @PutMapping("/request-for-room")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> requestServiceForRoom(@RequestBody HotelServiceRequestDTO serviceRequest) {
+    public ResponseEntity<Void> requestServiceForRoom(
+            @Valid @RequestBody HotelServiceRequestDTO serviceRequest) {
         extrasService.requestServiceForRoom(serviceRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

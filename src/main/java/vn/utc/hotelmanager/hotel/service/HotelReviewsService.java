@@ -43,7 +43,7 @@ public class HotelReviewsService {
     }
 
     public void createUserReview(String content) {
-        if (content == null || content.trim().isEmpty())
+        if (content == null)
             throw new InvalidRequestException("Review content cannot be empty!");
 
         String currentUsername = ApplicationUserService.getCurrentUser().getUsername();
@@ -63,9 +63,6 @@ public class HotelReviewsService {
     }
 
     public void deleteUserReview(Integer reviewId) {
-        if (reviewId < 0)
-            throw new InvalidRequestException("Invalid review id: value cannot be less than zero");
-
         Review userReview = reviewRepository.findById(reviewId).orElseThrow(
                 () -> new ResourceNotFoundException(
                         String.format("Review with id %d does not exist", reviewId)

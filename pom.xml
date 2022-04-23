@@ -108,6 +108,13 @@
 			<artifactId>hibernate-jpamodelgen</artifactId>
 			<version>5.3.26.Final</version>
 		</dependency>
+
+		<!-- Validator -->
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.0.13.Final</version>
+		</dependency>
 	</dependencies>
 
 	<build>

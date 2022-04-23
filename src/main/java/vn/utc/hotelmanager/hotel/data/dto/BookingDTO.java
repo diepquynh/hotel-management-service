@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import vn.utc.hotelmanager.hotel.model.Booking;
 import vn.utc.hotelmanager.hotel.model.Receipt;
 
+import javax.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +25,7 @@ public class BookingDTO {
 
     private Instant created_date;
 
-    private List<BookingDetailsDTO> bookingDetails;
+    private List<@Valid BookingDetailsDTO> bookingDetails;
 
     public BookingDTO(Booking booking) {
         setBookingId(booking.getId());

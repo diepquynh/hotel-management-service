@@ -49,7 +49,8 @@ public class ExtrasService {
 
     public List<HotelServiceItemDTO> getFilteredHotelServices(
             HotelServiceFilterRequestDTO serviceRequest) {
-        verifyFilterRequest(serviceRequest);
+        if (serviceRequest.getPriceFrom() > serviceRequest.getPriceTo())
+            throw new InvalidRequestException("Invalid requested service price range: priceFrom > priceTo");
 
         return serviceRepository.findFilteredServices(serviceRequest)
                 .stream().map(HotelServiceItemDTO::new)
@@ -146,9 +147,6 @@ public class ExtrasService {
 
     @Transactional
     public void requestServiceForRoom(HotelServiceRequestDTO serviceRequest) {
-        if (serviceRequest.getRoomId() < 0)
-            throw new InvalidRequestException("Invalid room id: cannot be less than zero!");
-
         if (CollectionUtils.isEmpty(serviceRequest.getServiceRequests()))
             throw new InvalidRequestException("Service requests cannot be empty!");
 
@@ -180,12 +178,6 @@ public class ExtrasService {
                                     String.format("Hotel service with id %d not found",
                                             request.getServiceId())
                             ));
-
-            if (request.getQuantity() < 0)
-                throw new InvalidRequestException(
-                        String.format("Invalid quantity %d: cannot be less than zero",
-                                request.getQuantity())
-                );
 
             ReceiptRoomService targetReceiptRoomService =
                     ReceiptRoomService.builder()
@@ -219,32 +211,7 @@ public class ExtrasService {
         if (serviceItem.getPrice() == null)
             throw new InvalidRequestException("Service price cannot be null!");
 
-        if (serviceItem.getPrice() < 0)
-            throw new InvalidRequestException("Invalid service price: cannot be less than zero!");
-
         if (serviceItem.getType() == null)
             throw new InvalidRequestException("Service type cannot be null!");
-    }
-
-    private void verifyFilterRequest(HotelServiceFilterRequestDTO serviceRequest) {
-        if (serviceRequest.getType() != null) {
-            if (serviceRequest.getType().trim().isEmpty())
-                throw new InvalidRequestException("Requested service type cannot be empty!");
-        }
-
-        if (serviceRequest.getPriceFrom() != null) {
-            if (serviceRequest.getPriceFrom() < 0)
-                throw new InvalidRequestException("Requested service price start cannot be less than zero");
-        }
-
-        if (serviceRequest.getPriceTo() != null) {
-            if (serviceRequest.getPriceTo() < 0)
-                throw new InvalidRequestException("Requested service price end cannot be less than zero");
-        }
-
-        if (serviceRequest.getPriceFrom() != null && serviceRequest.getPriceTo() != null) {
-            if (serviceRequest.getPriceFrom() > serviceRequest.getPriceTo())
-                throw new InvalidRequestException("Invalid requested service price range: priceFrom > priceTo");
-        }
     }
 }
