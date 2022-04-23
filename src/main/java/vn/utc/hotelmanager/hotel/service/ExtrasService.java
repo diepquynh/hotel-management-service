@@ -107,6 +107,7 @@ public class ExtrasService {
 
             ReceiptRoomService targetReceiptRoomService =
                     ReceiptRoomService.builder()
+                            .receiptRoom(targetReceiptRoom)
                             .service(targetService)
                             .quantity(request.getQuantity())
                             .build();
