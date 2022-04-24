@@ -66,7 +66,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/rooms/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/rooms/filter",
                         "/rooms/available").permitAll()
-                .antMatchers(HttpMethod.GET, "/responses").permitAll()
+                .antMatchers(HttpMethod.GET, "/reviews").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()
