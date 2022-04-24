@@ -28,6 +28,11 @@ public class Room {
     @ToString.Exclude
     private Set<ReceiptRoom> receiptRooms;
 
+    @OneToMany(mappedBy = "originalRoom", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<RoomSwap> roomSwaps;
+
     @ManyToOne
     @JoinTable(
             name = "rooms_room_types",
@@ -45,5 +50,13 @@ public class Room {
         }
 
         return null;
+    }
+
+    public boolean hasSomeoneLiving() {
+        if (getActiveReceiptRoom() == null)
+            return false;
+
+        return getActiveReceiptRoom().getReceipt()
+                .getBooking().getArrived().equals(true);
     }
 }

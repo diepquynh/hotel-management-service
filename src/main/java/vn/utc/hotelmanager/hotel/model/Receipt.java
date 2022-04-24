@@ -35,6 +35,11 @@ public class Receipt {
     @ToString.Exclude
     private Booking booking;
 
+    @OneToMany(mappedBy = "receipt", cascade = CascadeType.ALL)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<RoomSwap> roomSwaps;
+
     public void addTotalBalance(Double extraBalance) {
         total_balance += extraBalance;
     }

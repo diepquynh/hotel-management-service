@@ -4,6 +4,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Set;
 
 @Entity
@@ -46,7 +48,12 @@ public class ReceiptRoom {
                currentTime.isAfter(arrivalTime) && currentTime.isBefore(leaveTime);
     }
 
-    public void addReceiptRoomService(ReceiptRoomService receiptRoomService) {
-        receiptRoomServices.add(receiptRoomService);
+    public boolean isReceiptRoomConflictBetweenDates(LocalDateTime startDate,
+                                                     LocalDateTime endDate) {
+        Instant instantStartDate = startDate.atZone(ZoneId.systemDefault()).toInstant();
+        Instant instantEndDate = endDate.atZone(ZoneId.systemDefault()).toInstant();
+
+        return instantStartDate.isBefore(leaveTime) &&
+                instantEndDate.isAfter(arrivalTime);
     }
 }
