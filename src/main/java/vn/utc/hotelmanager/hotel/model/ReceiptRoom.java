@@ -26,7 +26,7 @@ public class ReceiptRoom {
     @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
-    @OneToMany(mappedBy = "receiptRoom")
+    @OneToMany(mappedBy = "receiptRoom", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<ReceiptRoomService> receiptRoomServices;

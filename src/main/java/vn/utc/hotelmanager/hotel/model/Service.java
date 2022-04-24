@@ -29,7 +29,7 @@ public class Service {
     @Column(name = "image", length = 256)
     private String image;
 
-    @OneToMany(mappedBy = "service")
+    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<ReceiptRoomService> receiptRoomServices;

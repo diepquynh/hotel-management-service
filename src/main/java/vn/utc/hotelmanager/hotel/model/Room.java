@@ -23,7 +23,7 @@ public class Room {
     @Column(name = "image", length = 256)
     private String image;
 
-    @OneToMany(mappedBy = "room")
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<ReceiptRoom> receiptRooms;

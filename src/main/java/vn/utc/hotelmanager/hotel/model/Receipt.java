@@ -25,7 +25,7 @@ public class Receipt {
     @Column(name = "total_balance")
     private Double total_balance;
 
-    @OneToMany(mappedBy = "receipt")
+    @OneToMany(mappedBy = "receipt", cascade = CascadeType.ALL)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<ReceiptRoom> receiptRooms;

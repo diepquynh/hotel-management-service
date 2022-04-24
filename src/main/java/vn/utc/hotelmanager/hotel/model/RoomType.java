@@ -28,7 +28,7 @@ public class RoomType {
     private Integer capacity;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "roomType", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "roomType")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Set<Room> rooms;

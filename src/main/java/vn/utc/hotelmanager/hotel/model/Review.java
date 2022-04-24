@@ -27,7 +27,7 @@ public class Review {
     @Column(name = "content", nullable = false, length = 512)
     private String content;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinTable(
             name = "users_reviews",
             joinColumns = @JoinColumn(name = "review_id", referencedColumnName = "id"),
