@@ -29,7 +29,7 @@ public class HotelServiceController {
         return new ResponseEntity<>(extrasService.getAllHotelServices(), HttpStatus.OK);
     }
 
-    @GetMapping("/filter")
+    @PostMapping("/filter")
     public ResponseEntity<List<HotelServiceItemDTO>> getServicesFiltered(
             @Valid @RequestBody HotelServiceFilterRequestDTO serviceRequest) {
         return new ResponseEntity<>(extrasService.getFilteredHotelServices(serviceRequest), HttpStatus.OK);

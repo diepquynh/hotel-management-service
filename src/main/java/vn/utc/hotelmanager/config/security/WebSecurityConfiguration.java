@@ -62,7 +62,10 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/users/login/oauth").permitAll()
                 .antMatchers(HttpMethod.GET,"/hotel-services",
                         "/hotel-services/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/hotel-services/filter").permitAll()
                 .antMatchers(HttpMethod.GET, "/rooms/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/rooms/filter",
+                        "/rooms/available").permitAll()
                 .antMatchers(HttpMethod.GET, "/responses").permitAll()
                 .anyRequest().authenticated()
                 .and()

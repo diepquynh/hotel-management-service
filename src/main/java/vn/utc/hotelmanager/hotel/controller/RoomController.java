@@ -33,7 +33,7 @@ public class RoomController {
         return new ResponseEntity<>(roomService.getAllRooms(), HttpStatus.OK);
     }
 
-    @GetMapping("/filter")
+    @PostMapping("/filter")
     public ResponseEntity<List<RoomResponseDTO>> getFilteredRooms(
             @Valid @RequestBody RoomFilterRequestDTO roomRequest) {
         return new ResponseEntity<>(roomService.getFilteredRooms(roomRequest), HttpStatus.OK);
@@ -49,7 +49,7 @@ public class RoomController {
                 roomService.getAvailableRoomsForDateRange(startTime, endTime), HttpStatus.OK);
     }
 
-    @GetMapping("/available")
+    @PostMapping("/available")
     public ResponseEntity<List<RoomResponseDTO>> getAvailableRoomsBetweenTime(
             @Valid @RequestBody AvailableRoomRequestDTO roomRequest) {
         return new ResponseEntity<>(
