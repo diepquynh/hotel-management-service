@@ -12,10 +12,7 @@ public class BookingUpdateRequestDTO {
     @Positive(message = "User id must be more than 0")
     private Integer userId;
 
-    @NotNull(message = "Receipt id cannot be null")
-    @Positive(message = "Receipt id must be more than 0")
-    private Integer receiptId;
-
-    @NotNull(message = "Arrival state cannot be null")
-    private Boolean arrived;
+    @NotNull(message = "Booking id cannot be null")
+    @Positive(message = "Booking id must be more than 0")
+    private Integer bookingId;
 }

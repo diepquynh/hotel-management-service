@@ -1,6 +1,7 @@
 package vn.utc.hotelmanager.hotel.model;
 
 import lombok.*;
+import vn.utc.hotelmanager.hotel.utils.PaymentStateConstants;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -36,5 +37,9 @@ public class Receipt {
 
     public void addTotalBalance(Double extraBalance) {
         total_balance += extraBalance;
+    }
+
+    public boolean isReceiptCancelled() {
+        return booking.getPaymentState().equals(PaymentStateConstants.CANCELLED.getValue());
     }
 }

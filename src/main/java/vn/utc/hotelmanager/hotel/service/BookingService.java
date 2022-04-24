@@ -138,21 +138,27 @@ public class BookingService {
 
     public void guestHasArrived(BookingUpdateRequestDTO updateRequest) {
         Booking thisBooking = bookingRepository.findByReceiptId(
-                updateRequest.getReceiptId()
+                updateRequest.getBookingId()
         ).orElseThrow(
                 () -> new ResourceNotFoundException(
-                        String.format("User receipt with id %d not found",
-                                updateRequest.getReceiptId())
+                        String.format("Booking with id %d not found",
+                                updateRequest.getBookingId())
                 )
         );
 
         if (!ApplicationUserService.currentUserHasAdminRole()) {
             if (thisBooking.getUser().getId() != updateRequest.getUserId())
                 throw new InvalidRequestException(
-                        String.format("Receipt with id %d does not belong to user with id %d",
-                                updateRequest.getReceiptId(), updateRequest.getUserId())
+                        String.format("Booking with id %d does not belong to user with id %d",
+                                updateRequest.getBookingId(), updateRequest.getUserId())
                 );
         }
+
+        if (thisBooking.getPaymentState().equals(PaymentStateConstants.CANCELLED.getValue()))
+            throw new InvalidRequestException(
+                    String.format("Booking with id %d was cancelled",
+                            updateRequest.getBookingId())
+            );
 
         thisBooking.setArrived(true);
 
@@ -161,6 +167,48 @@ public class BookingService {
         } catch (Exception e) {
             throw new RepositoryAccessException(
                     String.format("Cannot set arrived state: %s", e.getMessage()));
+        }
+    }
+
+    public void deleteThisBooking(BookingUpdateRequestDTO deletionRequest) {
+        Booking thisBooking = bookingRepository.findById(deletionRequest.getBookingId())
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                String.format("Booking with id %d does not exist",
+                                        deletionRequest.getBookingId())
+                        )
+                );
+
+        if (thisBooking.getUser().getId() != deletionRequest.getUserId())
+            throw new InvalidRequestException(
+                    String.format("Booking with id %d does not belong to user with id %d",
+                            deletionRequest.getBookingId(), deletionRequest.getUserId())
+            );
+
+        if (!ApplicationUserService.currentUserHasAdminRole()) {
+            User bookingUser = userRepository.findById(deletionRequest.getUserId())
+                    .orElseThrow(
+                            () -> new ResourceNotFoundException(
+                                    String.format("User with id %d does not exist",
+                                            deletionRequest.getUserId())
+                            )
+                    );
+            if (!ApplicationUserService.getCurrentUser()
+                    .getUsername().equals(bookingUser.getUsername())) {
+                throw new InvalidRequestException("Requested user id does not match with current user");
+            }
+        }
+
+        if (thisBooking.getArrived().equals(true))
+            throw new InvalidRequestException("This booking has guests arrived, cannot be deleted");
+
+        thisBooking.setPaymentState(PaymentStateConstants.CANCELLED.getValue());
+
+        try {
+            bookingRepository.save(thisBooking);
+        } catch (Exception e) {
+            throw new RepositoryAccessException(
+                    String.format("Cannot delete this booking: %s", e.getMessage()));
         }
     }
 

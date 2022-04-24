@@ -53,8 +53,9 @@ public class BookingController {
 
     @DeleteMapping
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteThisBooking(@RequestBody BookingUpdateRequestDTO updateRequest) {
-
+    public ResponseEntity<Void> deleteThisBooking(
+            @Valid @RequestBody BookingUpdateRequestDTO deletionRequest) {
+        bookingService.deleteThisBooking(deletionRequest);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

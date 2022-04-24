@@ -4,8 +4,6 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Set;
 
 @Entity
@@ -44,7 +42,8 @@ public class ReceiptRoom {
 
     public boolean isRoomReceiptActive() {
         Instant currentTime = Instant.now();
-        return currentTime.isAfter(arrivalTime) && currentTime.isBefore(leaveTime);
+        return !receipt.isReceiptCancelled() &&
+               currentTime.isAfter(arrivalTime) && currentTime.isBefore(leaveTime);
     }
 
     public void addReceiptRoomService(ReceiptRoomService receiptRoomService) {

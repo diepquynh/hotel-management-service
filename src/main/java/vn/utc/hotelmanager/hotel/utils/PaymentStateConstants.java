@@ -2,7 +2,8 @@ package vn.utc.hotelmanager.hotel.utils;
 
 public enum PaymentStateConstants {
     PAID("PAID"),
-    UNPAID("UNPAID");
+    UNPAID("UNPAID"),
+    CANCELLED("CANCELLED");
 
     private final String value;
 
