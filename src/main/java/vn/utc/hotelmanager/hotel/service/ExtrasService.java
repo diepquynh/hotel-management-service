@@ -49,8 +49,10 @@ public class ExtrasService {
 
     public List<HotelServiceItemDTO> getFilteredHotelServices(
             HotelServiceFilterRequestDTO serviceRequest) {
-        if (serviceRequest.getPriceFrom() > serviceRequest.getPriceTo())
-            throw new InvalidRequestException("Invalid requested service price range: priceFrom > priceTo");
+        if (serviceRequest.getPriceFrom() != null && serviceRequest.getPriceTo() != null) {
+            if (serviceRequest.getPriceFrom() > serviceRequest.getPriceTo())
+                throw new InvalidRequestException("Invalid requested service price range: priceFrom > priceTo");
+        }
 
         return serviceRepository.findFilteredServices(serviceRequest)
                 .stream().map(HotelServiceItemDTO::new)
