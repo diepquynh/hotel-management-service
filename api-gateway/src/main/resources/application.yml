@@ -1,0 +1,70 @@
+app:
+  config:
+#    host: host.docker.internal
+    host: localhost
+    keycloak:
+      url: http://${app.config.host}:8080/auth
+      realm: qlks
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+#      globalcors:
+#        corsConfigurations:
+#          '[/**]':
+#            allowedOrigins: "*"
+#            allowedMethods:
+#              - GET
+#              - POST
+#              - PUT
+#              - DELETE
+#            allowedHeaders:
+#              - Content-Type
+      routes:
+        - id: hotelmanager
+          uri: lb://hotelmanager
+          predicates:
+            Path=/hotel-management/**
+          filters:
+            - StripPrefix=1
+        - id: hotel-user-service
+          uri: lb://hotel-user-service
+          predicates:
+            Path=/hotel-user-service/**
+          filters:
+            - StripPrefix=1
+
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            token-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/token
+            authorization-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/auth
+            user-name-attribute: preferred_username
+            user-info-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/userinfo
+            jwk-set-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/certs
+            user-info-authentication-method: header
+        registration:
+          hotel-management:
+            provider: keycloak
+            client-id: hotel-management
+            client-secret: ZnjsPVDo4FsdNP3bmwX53uvdLQQM8VHr
+            authorization-grant-type: authorization_code
+            redirect-uri: http://${app.config.host}:8080/login/oauth2/code/keycloak
+            scope: openid
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${app.config.keycloak.url}/realms/${app.config.keycloak.realm}/protocol/openid-connect/certs
+
+server:
+  port: 8010
+
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka

@@ -1,0 +1,22 @@
+app:
+  config:
+    host: localhost
+    keycloak:
+      url: http://${app.config.host}:8080/auth
+      realm: qlks
+      client-id: hotel-user-management
+      client-secret: NlGOd0I0GWrTJrtwvQbH0FatJfuN5LPf
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/QuanLyKhachSan_dev
+    username: root
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    #    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+#        format_sql: true

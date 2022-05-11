@@ -1,0 +1,3 @@
+clients:
+  user:
+    url: http://localhost:8012

@@ -1,0 +1,6 @@
+server:
+  port: 8011
+
+spring:
+  application:
+    name: hotelmanager

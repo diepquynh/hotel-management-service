@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: hotel-user-service
+  profiles:
+    active: local
+
+server:
+  error:
+    include-message: always
+    include-binding-errors: always
+  port: 8012
+  servlet:
+    context-path: /api/v1

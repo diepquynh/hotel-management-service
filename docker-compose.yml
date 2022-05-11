@@ -1,0 +1,106 @@
+services:
+  mysql:
+    image: mysql:5.7
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=$MYSQLDB_ROOT_PASSWORD
+      - MYSQL_DATABASE=$MYSQLDB_DATABASE
+    networks:
+      - mysql
+    ports:
+      - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
+    volumes:
+      - db:/var/lib/mysql
+  keycloak:
+    depends_on:
+      - mysql
+    image: jboss/keycloak
+    restart: unless-stopped
+    environment:
+      - DB_VENDOR=MYSQL
+      - DB_ADDR=host.docker.internal
+      - DB_DATABASE=keycloak
+      - DB_USER=keycloak
+      - DB_PASSWORD=password
+      - DB_PORT=3306
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+    networks:
+      - mysql
+      - keycloak
+    ports:
+      - 8080:8080
+    volumes:
+      - ./keycloak-bcrypt-1.5.0.jar:/opt/jboss/keycloak/standalone/deployments/keycloak-bcrypt-1.5.0.jar
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    restart: on-failure
+    networks:
+      - spring
+    ports:
+      - 8761:8761
+    stdin_open: true
+    tty: true
+  api-gateway:
+    depends_on:
+      - eureka-server
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    restart: on-failure
+    networks:
+      - spring
+    ports:
+      - 8010:8010
+    stdin_open: true
+    tty: true
+  user-service:
+    depends_on:
+      - mysql
+      - eureka-server
+      - keycloak
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    restart: on-failure
+    networks:
+      - spring
+      - mysql
+    ports:
+      - 8012:8012
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    stdin_open: true
+    tty: true
+  app:
+    depends_on:
+      - mysql
+      - eureka-server
+    build:
+      context: ./hotel-management-service
+      dockerfile: Dockerfile
+    restart: on-failure
+    env_file: .env
+    networks:
+      - spring
+      - mysql
+    ports:
+      - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
+    environment:
+      - SPRING_PROFILES_ACTIVE=common,docker
+    stdin_open: true
+    tty: true
+
+volumes:
+  db:
+
+networks:
+  spring:
+    driver: bridge
+  mysql:
+    driver: bridge
+  keycloak:
+    driver: bridge
